@@ -1,0 +1,20 @@
+This dictionary (nl.dic) was downloaded from 4TeX's Home Page:
+
+  http://frambach.eco.rug.nl/4tex5/
+
+----- Original Message -----
+ From: "Erik Frambach" <erik.frambach@stelvio.nl>
+ To: <support@winedt.com>
+ Sent: Tuesday, August 20, 2002 9:30 AM
+ Subject: update of WinEdt NL dictionary
+
+> Dear Aleksander,
+>
+> I've attached an updated version of the NL dictionary. A lot
+> of errors were corrected an a lot of new words were added.
+> The conditions for use and distribution haven't changed, so
+> you can spread it to anyone who wants it. Keep up the good
+> work!
+>
+> Greetings,
+> Erik Frambach
