@@ -1,0 +1,43 @@
+____________________________________________________________________
+
+SI.DIC
+        Slovenian Word List (v.1.0) for WinEdt
+        Created:        January 27, 1999
+        Last Revision:  February 19, 1999
+        Code Page:      cp1250
+
+        Converted from
+            http://nl.ijs.si/gnusl/tex/tslovene/src/mte-sl.words
+        by applying the following string translation in WinEdt
+        (Latin II -> cp1250):
+            #185 -> #154
+            #190 -> #158
+            #174 -> #142
+            #169 -> #138
+        sorting the result with WinEdt's Dictionary Manager and
+        saving it in UNIX (LF) format.
+
+        Since WinEdt by default ignores one-letter words such
+        words have been removed. Also a dot has been removed from
+        a few abbreviations (such as prof., mag., itd...) because
+        WinEdt's spell checking algorithm is not designed to match
+        words containing non-alphabetical characters.
+____________________________________________________________________
+
+This version of Slovenian word dictionary was compiled by Aleksander
+Simonic and Uros Lotric for use with WinEdt. The dictionary is
+included in WinEdt's dictionary collection on CTAN with the kind
+permission of GNUsl (http://nl.ijs.si/gnusl/).
+
+The original file mte-sl.words was build by company Amebis
+(http://www.amebis.si/) in cooperation with Institute Jozef Stefan
+(http://www.ijs.si) under the European MULTEXT-East project. It was
+derived from BesAna spell-checker dictionary and now it is freely
+accessible at GNUsl web site
+    http://nl.ijs.si/gnusl/tex/tslovene/src/mte-sl.words
+under GNU Copyleft.
+
+Slovenian word list for WinEdt, si.dic, is freely accessible for
+non-commercial use. Besides, it should not be used as integral part
+of any commercial product.
+____________________________________________________________________

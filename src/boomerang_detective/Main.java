@@ -11,13 +11,14 @@ import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Scanner;
 import java.util.Map.Entry;
 
 public class Main 
 {
 	static double falsePositiveProbability = 0.1;
-	static int expectedSize = 100000000;
+	static int expectedSize = 500000;
 	
 	//GERMAN
 	static BloomFilter<String> de_bloomFilter = new BloomFilter<String>(falsePositiveProbability, expectedSize);
@@ -41,22 +42,19 @@ public class Main
         
         //THIS SEGMENT IS FOR DYNAMICALLY LOCATING THE DIRECTORY, SO THE PROGRAM WORKS "OUT OF THE BOX"
 /*******************************************************************************************************************************************/
-    	//this holds all the dictionary files, i.e. word lists garners from language folders
+		//this holds all the dictionary files, i.e. word lists garners from language folders
         ArrayList<Path> dictionary_files = new ArrayList<Path>();
 		
-        
-		File currentDir = new File( "." ); // Read current file location
-        //System.out.println(currentDir.getAbsolutePath());
-        
-        File targetDir = null;
-        if (currentDir.isDirectory()) 
-        {
-            targetDir = new File( currentDir, "ascii_word_lists" ); // Construct the target directory file with the right parent directory
-        }
-        if ( targetDir != null && targetDir.exists() )
-        {
-            SearchDirectories.listDirectoryAndFiles( targetDir.toPath(), dictionary_files );
-        }
+		File currentDir = new File(".");
+	    
+	    File targetDir = new File( currentDir, "ascii_word_lists" ); 
+	    //File targetDir = new File( currentDir, "unicode_word_lists" ); 
+
+	    if (targetDir.exists()) 
+	    {
+	    	SearchDirectories.listDirectoryAndFiles( targetDir.toPath(), dictionary_files );
+	    }
+		
 /*******************************************************************************************************************************************/
        
         //this populates word presence data structs for each language
@@ -71,140 +69,97 @@ public class Main
         	
             BufferedReader br = new BufferedReader( new FileReader( dir.toString() ) );
             String line = null;
-            while ((line = br.readLine()) != null)
+            
+            BloomFilter<String> bloomFilter;
+            if (word_holding_directory_path.toLowerCase().contains("/de/")) 
             {
-            	
-            	//GERMAN
-                if(word_holding_directory_path.toLowerCase().contains("/de/") )
-                {
-                	de_bloomFilter.add( line.toLowerCase().trim() );	
-                }
-                //ENGLISH
-                if(word_holding_directory_path.toLowerCase().contains("/eng/") )
-                {
-                	eng_bloomFilter.add( line.toLowerCase().trim() );
-                }
-                //FRENCH
-                if(word_holding_directory_path.toLowerCase().contains("/fr/") )
-                {
-                	fr_bloomFilter.add( line.toLowerCase().trim() );
-                }
-                //SPANISH
-                if(word_holding_directory_path.toLowerCase().contains("/es/") )
-                {
-                	es_bloomFilter.add( line.toLowerCase().trim() );
-                }
-                //ITALIAN
-                if(word_holding_directory_path.toLowerCase().contains("/it/") )
-                {
-                	it_bloomFilter.add( line.toLowerCase().trim() );
-                }
-                //PORTUGESE
-                if(word_holding_directory_path.toLowerCase().contains("/pt/") )
-                {
-                	pt_bloomFilter.add( line.toLowerCase().trim() );
-                }
-                //DUTCH
-                if(word_holding_directory_path.toLowerCase().contains("/nl/") )
-                {
-                	nl_bloomFilter.add( line.toLowerCase().trim() );
-                }
+            	bloomFilter = de_bloomFilter;
+            } 
+            else if (word_holding_directory_path.toLowerCase().contains("/eng/")) 
+            {
+            	bloomFilter = eng_bloomFilter;
+            } 
+            else if (word_holding_directory_path.toLowerCase().contains("/fr/")) 
+            {
+            	bloomFilter = fr_bloomFilter;
+            } 
+            else if (word_holding_directory_path.toLowerCase().contains("/es/")) 
+            {
+            	bloomFilter = es_bloomFilter;
+            } 
+            else if (word_holding_directory_path.toLowerCase().contains("/it/")) 
+            {
+            	bloomFilter = it_bloomFilter;
+            } 
+            else if (word_holding_directory_path.toLowerCase().contains("/nl/")) 
+            {
+            	bloomFilter = nl_bloomFilter;
+            } 
+            else if (word_holding_directory_path.toLowerCase().contains("/pt/")) 
+            {
+            	bloomFilter = pt_bloomFilter;
+            } 
+            else 
+            {
+                continue;
             }
+
+            while ( ( line = br.readLine() ) != null ) 
+            {
+            	bloomFilter.add( line.toLowerCase().trim() );
+            }
+            
         }
-        
+
         
 /*******************************************************************************************************************************************/ 
         //GET THE USER INPUT
-        ArrayList<String> input_text = new ArrayList<String>();
-        
-        //Scanner in = new Scanner( System.in , "UTF-8");
         
         Scanner in = new Scanner(System.in);
+        
         System.out.println("Please enter a sentence: ");
-         
-        String [] tokens = in.nextLine().split("\\s");
-         
-        for (int i = 0; i < tokens.length; i++)
-        {
-        	input_text.add( tokens[i].toString() );
-        }
         
-       
-        
+        String[] input_text = in.nextLine().split("\\s");
+      
 /*******************************************************************************************************************************************/
         
-        
-    	int total_de  = 0;
-    	int total_eng = 0;
-    	int total_es  = 0;
-    	int total_fr  = 0;
-    	int total_gk  = 0;
-    	int total_it  = 0;
-    	int total_nl  = 0;
-    	int total_pt  = 0;
+        Map<String, BloomFilter<String>> langMaps = new HashMap<>();
+        langMaps.put( "Italiano, (Italian)", it_bloomFilter);
+        langMaps.put( "Français, (French)", fr_bloomFilter);
+        langMaps.put( "English, (English)", eng_bloomFilter);
+        langMaps.put( "Deutsch, (German)", de_bloomFilter);
+        langMaps.put( "Español, (Spanish)", es_bloomFilter);
+        langMaps.put( "Nederlandse, (Dutch)", nl_bloomFilter);
+        langMaps.put( "Português, (Portugese)", pt_bloomFilter);
 
-                	
-        for(String word : input_text)
+ 
+        int maxCount = 0;
+        String maxLang = null;
+
+        for (Map.Entry<String, BloomFilter<String>> entry : langMaps.entrySet()) 
         {
-        	
-            if(de_bloomFilter.contains( word ) )
+            int count = 0;
+            BloomFilter<String> words = entry.getValue();
+
+            for (String word : input_text) 
             {
-    		    total_de++;
+                String normalized = word.trim().toLowerCase();
+                if (words.contains(normalized)) 
+                {
+                    ++count;
+                }
             }
-            if(eng_bloomFilter.contains( word ) )
-            { 
-    		    total_eng++;
-            }
-            if(fr_bloomFilter.contains( word ) )
+            
+            if (count > maxCount) 
             {
-    		    total_fr++;
-            }
-            if(es_bloomFilter.contains( word ) )
-            {
-    		    total_es++;
-            }
-            if(it_bloomFilter.contains( word ) )
-            {
-    		    total_it++;
-            }
-            if(pt_bloomFilter.contains( word ) )
-            {
-    		    total_pt++;
-            }
-            if(nl_bloomFilter.contains( word ) )
-            {
-    		    total_nl++;
+                maxLang = entry.getKey();
+                maxCount = count;
+                
+                System.out.println( "maxLang is: " + maxLang + "count is: " + count );
             }
         }
-	            
-        
-        
-        //this has to be here. you need to add them here AFTER the totals 
-        //have been calculated. 
-        HashMap< String, Integer > most_hits_lang = new HashMap<String, Integer>();
-        most_hits_lang.put( "Deutsch, (German)", total_de );
-        most_hits_lang.put( "English, (English)", total_eng );
-        most_hits_lang.put( "Español, (Spanish)", total_es );
-        most_hits_lang.put( "Français, (French)", total_fr );
-        most_hits_lang.put( "Ελληνική, (Greek)", total_gk );
-        most_hits_lang.put( "Italiano, (Italian)", total_it );
-        most_hits_lang.put( "Nederlandse, (Dutch)", total_nl );
-        most_hits_lang.put( "Português, (Portugese)", total_pt );
 
-        
-        Entry<String,Integer> maxEntry = null;
-
-        for(Entry<String,Integer> entry : most_hits_lang.entrySet()) 
-        {
-        	System.out.println( entry.getKey() + ", " +  entry.getValue() );
-        	
-            if (maxEntry == null || entry.getValue() > maxEntry.getValue()) 
-            {
-                maxEntry = entry;
-            }
-        }
-        
-        System.out.println("Language is: " + maxEntry.getKey() );
+        System.out.println( "Language is: " + maxLang );
 
         
         
