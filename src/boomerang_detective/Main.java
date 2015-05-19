@@ -11,9 +11,12 @@ import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.Map.Entry;
+
+import javax.swing.JFileChooser;
 
 public class Main 
 {
@@ -35,9 +38,10 @@ public class Main
 	//DUTCH
 	static BloomFilter<String> nl_bloomFilter = new BloomFilter<String>(falsePositiveProbability, expectedSize);
 	
-	public static void main( String[] args ) throws URISyntaxException, IOException
+	public static void process_input( List<String> input_text ) throws URISyntaxException, IOException
     {
-
+//		for (String p : input_text)
+//		    System.out.println( p );
 	
         
         //THIS SEGMENT IS FOR DYNAMICALLY LOCATING THE DIRECTORY, SO THE PROGRAM WORKS "OUT OF THE BOX"
@@ -111,18 +115,7 @@ public class Main
             
         }
 
-        
-/*******************************************************************************************************************************************/ 
-        //GET THE USER INPUT
-        
-        Scanner in = new Scanner(System.in);
-        
-        System.out.println("Please enter a sentence: ");
-        
-        String[] input_text = in.nextLine().split("\\s");
-      
-/*******************************************************************************************************************************************/
-        
+       
         Map<String, BloomFilter<String>> langMaps = new HashMap<>();
         langMaps.put( "Italiano, (Italian)", it_bloomFilter);
         langMaps.put( "Français, (French)", fr_bloomFilter);
@@ -154,8 +147,6 @@ public class Main
             {
                 maxLang = entry.getKey();
                 maxCount = count;
-                
-                System.out.println( "maxLang is: " + maxLang + "count is: " + count );
             }
         }
 
